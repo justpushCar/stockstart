@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link href="public/css/game.css" rel="stylesheet" type="text/css" />
+<title>Insert title here</title>
+</head>
+<body>
+<div id="wraper_room">
+        <div id="room_init">
+             <div id="left">
+                  <p>输入昵称:<input type='text' name='nickname'></input></p>
+                  <p>输入房间名称:<input type='text' name='room_name'></input></p>
+                  <p>输入房间号:<input type='text' name='room_number'></input></p>
+	              <p>输入房间密码:<input type='text' name='room_pwd'></input></p>	              	              
+                  <a href="javascript:;" class='create_room'>创建房间</a>	             
+             </div>
+             <div id="right">	
+                  <p>输入昵称:<input type='text' name='nickname'></input></p>              
+	              <p>输入房间号:<input type='text' name='room_number'></input></p>
+	              <p>输入房间密码:<input type='text' name='room_pwd'></input></p>
+	              <a href="javascript:;" class='in_room'>进入房间</a>
+             </div>
+    	</div>
+    	<div id="room">
+    	    <ul>
+    	        <h2>当前房间人员</h2>
+    	    </ul>
+    	</div>  
+</div>
+<div id="wraper" >
+	<img src="" class='bk_img'>
+ 	<div id="loading">
+	     <div class='loading_show'>
+	          <span>数据加载中:100%</span>
+	          <p></p>
+	     </div> 
+	</div> 
+    <div id="main">
+          <ul class="game game_1">
+             <div class="content">
+                    <canvas id="myCanvas1" class="myCanvas" width="780" height="660"></canvas>                          
+             </div> 
+             <ul class="text">
+                    <li class='picture_number'>剩余图片:</li>
+                    <li class='sy_time'>剩余时间:</li>
+                    <li class='score'>统计得分:</li>
+              </ul>
+              <ul class="caozuo">
+                    <a class='btn_cp' href="javascript:void(0)">重新排列</a>
+                    <a class='btn_ts' href="javascript:void(0)">提示</a>
+              </ul>  
+              <div class='time'><span>100%</span><p></p></div> 
+          </ul>   
+          <ul class="game game_2">
+             <div class="content">
+                    <canvas id="myCanvas2" class="myCanvas" width="780" height="660"></canvas>                          
+             </div> 
+             <ul class="text">
+                    <li class='picture_number'>剩余图片:</li>
+                    <li class='sy_time'>剩余时间:</li>
+                    <li class='score'>统计得分:</li>
+              </ul>
+              <ul class="caozuo">
+                 <!--    <a class='btn_cp' href="javascript:void(0)">重新排列</a>
+                    <a class='btn_ts' href="javascript:void(0)">提示</a> -->
+              </ul>  
+              <div class='time'><span>100%</span><p></p></div> 
+          </ul>   
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="public/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="home/llk_js/game_init.js"></script>
+<script type="text/javascript" src="home/llk_js/loading_picture.js"></script>
+<script type="text/javascript" src="home/llk_js/game.js"></script>
+<script type="text/javascript" src="home/llk_js/game_view.js"></script>
+<script type="text/javascript" src="home/llk_js/game_1.js"></script>
+<script type="text/javascript" src="public/js/websocket.js"></script>
+<script type="text/javascript">
+//E:/wamp/www/apinkSocket/server/index.php
+/*实例化websocket与php通信*/
+var websocket=new Socket({
+	url:"ws://localhost:4000"//"ws://localhost:4000"
+});
+
+websocket.run();
+
+
+/*根据操作发送数据到服务器部分*/
+/*创建房间*/
+$("#wraper_room .create_room").click(function(){
+	var room_name=$("#left input[name='room_name']").val();
+	var room_pwd=$("#left input[name='room_pwd']").val();
+	var room_number=$("#left input[name='room_number']").val();
+	var nickname=$("#left input[name='nickname']").val();
+	var room_json={'room_name':room_name,'room_pwd':room_pwd,'room_number':room_number,'nickname':nickname,'caozuo':'create_room'};
+	websocket.send(JSON.stringify(room_json));//发送数据到服务器
+})
+
+/*进入房间*/
+$("#wraper_room .in_room").click(function(){
+	var room_number=$("#right input[name='room_number']").val();
+	var room_pwd=$("#right input[name='room_pwd']").val();
+	var nickname=$("#right input[name='nickname']").val();
+	var room_json={'room_pwd':room_pwd,'room_number':room_number,'nickname':nickname,'caozuo':'connect_room'};
+	websocket.send(JSON.stringify(room_json));//发送数据到服务器
+})
+
+/*游戏开始*/
+$(".game_start").live('click',function(){
+	var room_json={'caozuo':'game_start'};
+	websocket.send(JSON.stringify(room_json));//发送数据到服务器
+})
+
+//操作结果发给对手
+var callback={
+	 //清除图片时
+	 'clear':function(data){
+		 data.caozuo='clear';
+		 websocket.send(JSON.stringify(data));
+	 },
+	 //重新排列组合时
+	 'afresh_assemble':function(data_){
+		 data={'caozuo':'afresh_assemble','data':data_};
+		 websocket.send(JSON.stringify(data));
+	 },
+	 //游戏准备就绪时
+	 'ready':function(data_){
+		 data={'caozuo':'ready','data':data_};
+		 websocket.send(JSON.stringify(data));
+	 }
+}
+
+/*接受服务器返回数据处理部分*/
+//创建房间
+websocket.add_callback('create_room',function(data){
+	if(data.state=='1'){
+		$("#room_init").css('display','none');
+		show_room(data);
+		$("#room").append("<a href='javascript:;' class='game_start'>开始游戏</a>");
+	}
+})
+
+//进入连接房间
+websocket.add_callback('connect_room',function(data){
+	if(data.state=='1'){
+		$("#room_init").css('display','none');
+	    show_room(data);
+	}else{
+		alert(data.msg);
+	}
+})
+
+//游戏开始
+websocket.add_callback('game_start',function(data){
+	if(data.state=='1'){
+	    $("#wraper_room").css('display','none');
+	    $("#wraper").css('display','block');
+	    /*初始化自己游戏*/
+	    data_config.game_lv=data.game_lv;
+	    data_config.picture_key=data.picture_key;
+	    data_config.callback=callback;
+	    Apink.run(data_config);
+	}else{
+	    alert(data.msg);
+	}
+})
+
+//对手已经加载完毕 准备就绪
+websocket.add_callback('ready',function(data){
+    /*显示对手游戏*/
+    data_config.id='myCanvas2';
+    data_config.container='.game_2';
+    data_config.Apink_data=data.data;
+    Apink_1.run(data_config);  
+})
+
+//对手消除了图片
+websocket.add_callback('clear',function(data){
+	Apink_1.clear_show(data.point[0],data.point[1]); 
+	$(".game_2 .score").text('统计得分:'+data.score);//更新对手文本区域得分显示
+	$(".game_2 .picture_number").text('剩余图片:'+data.picture_number);//更新文本区域图片显示数量
+	Apink_1.times=data.times;
+	
+})
+
+//对手重新排列组合
+websocket.add_callback('afresh_assemble',function(data){
+	Apink_1.afresh_assemble(data.data);
+})
+
+function show_room(data){
+	if(data.type!='all'){
+		var html='<li>'+data.nickname+'</li>';
+		$("#room ul").append(html);
+	}else{
+		var html='<h2>当前房间人员</h2>';
+		for(var i=0;i<data.user_data.length;i++){
+			console.log(data.user_data[i]);
+			var html=html+'<li>'+data.user_data[i].nickname+'</li>';
+		}
+		$("#room ul").html(html);
+	}	
+}
+</script>
+</html>

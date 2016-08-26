@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0046)http://119.29.33.104/Demo/Slider/slider_1.html -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>轮播图Demo</title>
+
+<script type="text/javascript" src="./大神轮播图Demo_files/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="./大神轮播图Demo_files/Slider_1.js"></script>
+<meta name="description" content="">
+<style>
+*{padding:0; margin:0;font-size:16px;font-family:'微软雅黑'}
+   ul,li{padding:0; margin:0;}
+   ul,li{list-style:none;}
+   a{text-decoration:none;}
+   a:hover{text-decoration:none;border: 0}  
+#wraper{width:100%;max-width:1020px;min-width:500px;height:auto;margin:0 auto;}
+#banner{width:100%;max-width:1020px;height:auto;max-height:570px;position:relative;overflow:hidden;margin-top:10px;}
+#banner .buttonLeft{position:absolute;left:0;z-index:1;}
+#banner .buttonLeft img{max-width:100%;max-height: auto}
+#banner .buttonRight{position: absolute;right:0;z-index:1}
+#banner .buttonRight img{max-width:100%;max-height: auto}
+#banner .bannerList{width:100%;height:auto;float:left;position:absolute;top:0;left:0}
+#banner .bannerList li{max-width:1020px;width:100%;max-height:570px;float:left}
+#banner .bannerList li img{max-width:100%;max-height:570px;}
+
+#banner .flag{width:auto;height:20px;position:absolute;bottom:10px;margin:0 auto}
+#banner .flag a{display:block;width:20px;height:20px;background:pink;text-align:center;line-height:20px;float:left;margin-left: 5px;color:white}
+#banner .flag a.current{background:green}
+</style>
+</head>
+<body>
+<div id="wraper">	
+         <div id="banner" style="height: 570px;">
+         	   <a class="buttonLeft" style="top: 249.5px;"><img src="./大神轮播图Demo_files/left.png"></a>
+         	   <a class="buttonRight" style="top: 249.5px;"><img src="./大神轮播图Demo_files/right.png"></a>
+                <ul class="bannerList" style="width: 7140px; height: 570px; left: -5100px;"><li style="width: 1020px; height: 570px;"><img src="./大神轮播图Demo_files/swgl_5.jpg" style="max-width: 1020px; height: 570px;"></li>
+                        <li style="width: 1020px; height: 570px;"><img src="./大神轮播图Demo_files/swgl_11.jpg" style="max-width: 1020px; height: 570px;"></li>
+                        <li style="width: 1020px; height: 570px;"><img src="./大神轮播图Demo_files/swgl_21.jpg" style="max-width: 1020px; height: 570px;"></li>
+                        <li style="width: 1020px; height: 570px;"><img src="./大神轮播图Demo_files/swgl_31.jpg" style="max-width: 1020px; height: 570px;"></li>
+                        <li style="width: 1020px; height: 570px;"><img src="./大神轮播图Demo_files/swgl_41.jpg" style="max-width: 1020px; height: 570px;"></li>
+                        <li style="width: 1020px; height: 570px;"><img src="./大神轮播图Demo_files/swgl_5.jpg" style="max-width: 1020px; height: 570px;"></li>
+                <li style="width: 1020px; height: 570px;"><img src="./大神轮播图Demo_files/swgl_11.jpg" style="max-width: 1020px; height: 570px;"></li></ul>
+                <div class="flag" style="width: 125px; left: 447.5px;"><a class="">1</a><a class="">2</a><a class="">3</a><a class="">4</a><a class="current">5</a></div>
+        </div> 
+ </div>         	
+
+<script type="text/javascript">
+var Slider_1=function(){  
+    this.run=function(config){             
+           this.config(config);  
+           this.set_css();//设置样式      
+           this.set_EventListener();
+           this.lunbo({'type':'autoplay_left','special_effect_type':'3'});//向左轮播
+    };
+    this.config=function(config){
+           this.picture_number=$("#banner ul li").length;//图片数量
+           var html='';
+           for(var i=1;i<=this.picture_number;i++){
+                 html+="<a>"+i+"</a>";
+           }
+           $(".flag").html(html);
+    };
+    /***样式设置***/
+    this.set_css=function(){
+           var w=parseInt($("#banner").css('width'));    
+           var h=w*570/1020;
+           $("#banner").css({'height':h+'px'}); 
+           $("#banner ul").css({'width':w*this.picture_number+'px','height':h+'px'}); 
+           $("#banner ul li").css({'width':w+'px','height':h+'px'}); 
+           $("#banner ul li img").css({'max-width':w+'px','height':h+'px'}); 
+           //左右图标
+           var img_width=w*0.1>40?40:w*0.1;
+           var img_height=img_width*71/40;
+           var imgTop=h/2-img_height/2;
+           $("#banner .buttonLeft").css({'top':imgTop});
+           $("#banner .buttonRight").css({'top':imgTop});
+           $(".flag").css({'width':25*this.picture_number+'px','left':w/2-25*this.picture_number/2});
+           $(".flag a").eq(0).addClass('current');
+    };
+    /*banner轮播滚动*/
+    this.lunbo=function(arguments_){
+            this.lunbo_obj=new Lunbo({
+                 container:"#banner",//外部容器
+                 wraper:"#banner ul",//滑动的盒子 
+                 wraper_sub:"#banner ul li",//滑动的盒子里面的子类
+                 distance:0,//图片盒子之间的距离
+                 play_type:arguments_.type,//轮播类型
+                 play_rate:2000,//自动播放时间间隔
+                 move_time:400,//每轮播一次所需时间
+                 //picture_numbers:arguments_.picture_numbers,
+                 clear_time:arguments_.clear_time,
+                 special_effect_type:arguments_.special_effect_type,
+                 play_one:function(number){
+                        $("#banner .flag a").eq(number).addClass('current').siblings('a').removeClass('current');
+                 },
+                 play_one_autocode:{}
+             });
+    };
+    /***监听事件***/
+    this.set_EventListener=function(){
+            var _this=this;
+            /* 点击向左滑动*/
+            $("#banner .buttonLeft").click(function(){
+                   _this.lunbo_obj.play_right();
+            })
+            /*点击向右滑动*/
+            $("#banner .buttonRight").click(function(){
+                   _this.lunbo_obj.play_left();
+            })
+            /*鼠标移动上去效果*/
+            $('#banner').hover(function(){                 
+                          _this.lunbo_obj.rolltimer_clear();//自动轮播暂停
+                   },function(){
+                          _this.lunbo_obj.autoplay_left();//自动轮播开始
+                   }
+            )
+            $(".flag a").click(function(){
+            	     var number=$(this).index();    
+            	     $("#banner .flag a").eq(number).addClass('current').siblings('a').removeClass('current');	     
+            	      _this.lunbo_obj.move(number);
+            })
+    };
+}
+var slider_1 = new Slider_1();
+slider_1.run();
+
+var w=getOs()['width'];
+//监听屏幕尺寸发生变化
+$(window).resize(function(){
+    var now_w=getOs()['width'];
+    if(now_w!=w){  
+         w=now_w;
+         slider_1.set_css();
+         slider_1.lunbo_obj.resize();
+    }
+}) 
+</script>
+<div style="position: static; width: 0px; height: 0px; border: none; padding: 0px; margin: 0px;"><div id="trans-tooltip"><div id="tip-left-top" style="background: url(&quot;chrome-extension://ikkbfngojljohpekonpldkamedehakni/imgs/map/tip-left-top.png&quot;);"></div><div id="tip-top" style="background: url(&quot;chrome-extension://ikkbfngojljohpekonpldkamedehakni/imgs/map/tip-top.png&quot;) repeat-x;"></div><div id="tip-right-top" style="background: url(&quot;chrome-extension://ikkbfngojljohpekonpldkamedehakni/imgs/map/tip-right-top.png&quot;);"></div><div id="tip-right" style="background: url(&quot;chrome-extension://ikkbfngojljohpekonpldkamedehakni/imgs/map/tip-right.png&quot;) repeat-y;"></div><div id="tip-right-bottom" style="background: url(&quot;chrome-extension://ikkbfngojljohpekonpldkamedehakni/imgs/map/tip-right-bottom.png&quot;);"></div><div id="tip-bottom" style="background: url(&quot;chrome-extension://ikkbfngojljohpekonpldkamedehakni/imgs/map/tip-bottom.png&quot;) repeat-x;"></div><div id="tip-left-bottom" style="background: url(&quot;chrome-extension://ikkbfngojljohpekonpldkamedehakni/imgs/map/tip-left-bottom.png&quot;);"></div><div id="tip-left" style="background: url(&quot;chrome-extension://ikkbfngojljohpekonpldkamedehakni/imgs/map/tip-left.png&quot;);"></div><div id="trans-content"></div></div><div id="tip-arrow-bottom" style="background: url(&quot;chrome-extension://ikkbfngojljohpekonpldkamedehakni/imgs/map/tip-arrow-bottom.png&quot;);"></div><div id="tip-arrow-top" style="background: url(&quot;chrome-extension://ikkbfngojljohpekonpldkamedehakni/imgs/map/tip-arrow-top.png&quot;);"></div></div></body></html>
